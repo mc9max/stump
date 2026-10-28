@@ -25,6 +25,12 @@
 #   env-prefix config loader, verified in upstream source).
 # - The wrapper entrypoint chains to the upstream /entrypoint.sh, which
 #   execs the server binary intact; see entrypoint.sh for the rationale.
+# - client-assets/favicon-180x180-apple-touch-icon.png patches an
+#   upstream 0.1.11 packaging gap: the served index.html links an
+#   apple-touch-icon at /assets/favicon-180x180-apple-touch-icon.png
+#   but the built client does not ship that file (404). The patch is
+#   upstream's own favicon-192x192.png resized to 180x180, placed in
+#   the served client dir so the link resolves.
 # - No HEALTHCHECK: Railway's external healthcheckPath (/) is the check
 #   that matters; the distroless base has no curl/wget for an
 #   in-container check anyway.
@@ -35,6 +41,7 @@ ENV STUMP_CONFIG_DIR=/data/config \
     STUMP_TRUST_PROXY_HEADERS=true
 COPY --chmod=755 entrypoint.sh /railway-entrypoint.sh
 COPY samples/sample.cbz /app/samples/sample.cbz
+COPY client-assets/favicon-180x180-apple-touch-icon.png /app/client/assets/favicon-180x180-apple-touch-icon.png
 ENTRYPOINT ["/railway-entrypoint.sh"]
 LABEL org.opencontainers.image.source="https://github.com/mc9max/stump"
 LABEL org.opencontainers.image.title="Stump"
